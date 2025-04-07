@@ -20,11 +20,10 @@ This project recommends SHL assessments based on natural language queries or job
 | 🗨️ Crawling       | `Scrapy`                                                                          |
 | 🧠 NLP Pipeline   | `NLTK`, `transformers` (pipeline for summarization), `TfidfVectorizer`            |
 | 🔍 Embeddings     | `sentence-transformers` (`all-MiniLM-L6-v2`)                                      |
-| 📚 Vector Search  | `FAISS`                                                                            |
-| 🤖 LLM Tasks      | `Gemini API`                                                                       |
+| 📚 Vector Search  | `FAISS`                                                                                                                                                |
 | 💥 Web App        | `Streamlit`                                                                        |
 | 🧖‍♂️ API Endpoint   | `FastAPI`                                                                          |
-| ☁️ Hosting        | `ngrok` for demo link, `Render` for deployment (optional)                         |
+| ☁️ Hosting        | `ngrok` for demo link,                          |
 
 ---
 
