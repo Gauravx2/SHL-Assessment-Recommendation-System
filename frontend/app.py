@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 
-API_URL = "http://localhost:8000/recommend"  # change when deployed
+API_URL = "https://shl-assessment-recommendation-system-i4sd.onrender.com/recommend"  # change when deployed
 
 st.title("SHL Assessment Recommender")
 st.markdown("Enter a job description or requirements to get relevant assessments")
