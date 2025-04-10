@@ -18,7 +18,7 @@ This project recommends SHL assessments based on natural language queries or job
 | Layer            | Tools / Libraries                                                                 |
 |------------------|-----------------------------------------------------------------------------------|
 | 🗨️ Crawling       | `Scrapy`                                                                          |
-| 🧠 NLP Pipeline   | `NLTK`, `transformers` (pipeline for summarization), `TfidfVectorizer`            |
+| 🧠 NLP Pipeline   | `NLTK`, `Data Preprocessing`            |
 | 🔍 Embeddings     | `sentence-transformers` (`all-MiniLM-L6-v2`)                                      |
 | 📚 Vector Search  | `FAISS`                                                                                                                                                |
 | 💥 Web App        | `Streamlit`                                                                        |
