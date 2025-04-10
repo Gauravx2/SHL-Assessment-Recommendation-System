@@ -23,17 +23,15 @@ This project recommends SHL assessments based on natural language queries or job
 | 📚 Vector Search  | `FAISS`                                                                                                                                                |
 | 💥 Web App        | `Streamlit`                                                                        |
 | 🧖‍♂️ API Endpoint   | `FastAPI`                                                                          |
-| ☁️ Hosting        | `ngrok` for demo link,                          |
+| ☁️ Hosting        | `render` for demo link,                          |
 
 ---
 
 ### 🔗 Important URLs
 
-- **Web Demo**: [🔗 Open Web App](https://d1f5-2405-201-a40b-855-3c46-e9a1-ebbe-2bbe.ngrok-free.app)  
-- **API Endpoint**: `https://d1f5-2405-201-a40b-855-3c46-e9a1-ebbe-2bbe.ngrok-free.app/recommend?query=YOUR_QUERY`  
-  Example:  
-  ```
-  GET https://d1f5-...ngrok-free.app/recommend?query=frontend developer with limited time
+- **Web Demo**: [🔗 Open Web App](https://shl-assessment-recommendation-system-zyu2q7rqxmu42eoxcxfcpt.streamlit.app/)  
+- **API Endpoint**: `https://shl-assessment-recommendation-system-i4sd.onrender.com/`  
+
   ```
 - **GitHub Repo**: [https://github.com/Gauravx2/SHL-Assessment-Recommendation-System](https://github.com/Gauravx2/SHL-Assessment-Recommendation-System)
 
@@ -97,5 +95,5 @@ Scalable: Index supports thousands of assessments with low latency.
 
 User-Friendly: Frontend displays critical fields (name, URL, duration, etc.).
  **Demo Hosting**:
-   - Hosted on `localhost`, shared externally via `ngrok`.
+   - Hosted on `[localhost`, shared externally via `ngrok](https://shl-assessment-recommendation-system-i4sd.onrender.com/)`.
 
