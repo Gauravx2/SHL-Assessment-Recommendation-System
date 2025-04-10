@@ -58,20 +58,44 @@ shl_assessment_recommender/
 
 ### 📌 How It Works
 
-1. **Data Crawling**: Collected structured and unstructured SHL assessment data using `Scrapy`.
-2. **NLP Preprocessing**:
-   - Extracted keywords using `NLTK` and summarization using `transformers` pipeline.
-   - Created TF-IDF features for additional filtering.
-3. **Embedding Generation**:
-   - Used `sentence-transformers` (`all-MiniLM-L6-v2`) to generate dense vector embeddings for:
-     - Keywords
-     - Summaries
-     - Test types
-4. **Similarity Search**:
-   - Used `FAISS` for fast nearest-neighbor search on embedding space.
-5. **Frontend & API**:
-   - `Streamlit` for interactive frontend.
-   - `FastAPI` to serve predictions as JSON.
-6. **Demo Hosting**:
+ **Data Crawling**: Collected structured and unstructured SHL assessment data using `Scrapy`.
+Solution Steps
+**Data Preprocessing**
+
+Combined metadata (description, job levels, languages, etc.) into a single embedding-friendly text field.
+
+Standardized formats (e.g., "Yes"/"No" for booleans, comma-separated lists).
+
+Extracted numerical durations using regex.
+
+Embedding Generation
+
+Used sentence-transformers to convert text into 384-dimensional vectors.
+
+Normalized embeddings for cosine similarity.
+
+Stored embeddings as float32 for efficiency.
+
+**FAISS Indexing**
+
+Created a IndexFlatIP (inner product) index for fast similarity search.
+
+Saved index to disk for quick reloading.
+
+**API & Frontend**
+
+FastAPI: Exposed /recommend endpoint to query the FAISS index.
+
+Streamlit: Simple UI to input queries and display results in a table.
+
+CORS configured for local development.
+
+**Key Optimizations**
+Efficient Search: FAISS enables millisecond-level query responses.
+
+Scalable: Index supports thousands of assessments with low latency.
+
+User-Friendly: Frontend displays critical fields (name, URL, duration, etc.).
+ **Demo Hosting**:
    - Hosted on `localhost`, shared externally via `ngrok`.
 
