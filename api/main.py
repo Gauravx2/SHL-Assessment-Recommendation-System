@@ -1,69 +1,94 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import json
 import numpy as np
 import faiss
 from pathlib import Path
 from sentence_transformers import SentenceTransformer
-
 from fastapi.middleware.cors import CORSMiddleware
+import time
 
 app = FastAPI()
 
-# allow Streamlit’s origin (adjust if you host elsewhere)
-origins = [
-    "http://localhost:8501",
-]
-
+# CORS setup
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["http://localhost:8501", "http://localhost:8000"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-@app.get("/")
-def root():
-    return {"message": "API is running"}
-
-
-# Path configuration
+# Configuration
 BASE_DIR = Path(__file__).parent
-DATA_PATH = BASE_DIR.parent / "processing" / "processed_dataset.json"
-EMBEDDINGS_PATH = BASE_DIR / "data" / "embeddings.npy"
+DATA_PATH = BASE_DIR.parent / "data_process" / "processed_dataset.json"
+FAISS_INDEX_PATH = BASE_DIR / "data" / "faiss_index.bin"
 
-# Load data and embeddings
-with open(DATA_PATH) as f:
-    assessments = json.load(f)
+# Load resources once at startup
+@app.on_event("startup")
+def load_assets():
+    global assessments, index, model
     
-embeddings = np.load(EMBEDDINGS_PATH)
-index = faiss.IndexFlatL2(embeddings.shape[1])
-index.add(embeddings)
-
-model = SentenceTransformer('all-MiniLM-L6-v2')
+    try:
+        # Load assessment data
+        with open(DATA_PATH, "r", encoding="utf-8") as f:
+            assessments = json.load(f)
+        
+        # Load FAISS index
+        index = faiss.read_index(str(FAISS_INDEX_PATH))
+        
+        # Load embedding model
+        model = SentenceTransformer('all-MiniLM-L6-v2')
+        
+        print("Successfully loaded all resources")
+    except Exception as e:
+        print(f"Failed to initialize: {str(e)}")
+        raise e
 
 class Query(BaseModel):
     text: str
-    max_results: int = 10
+    max_results: int = 5
 
 @app.post("/recommend")
 async def recommend(query: Query):
-    # Encode query
-    query_embedding = model.encode([query.text])
+    start_time = time.time()
     
-    # Search FAISS index
-    distances, indices = index.search(query_embedding, query.max_results)
+    try:
+        # Generate query embedding
+        query_embedding = model.encode(
+            [query.text],
+            normalize_embeddings=True,
+            show_progress_bar=False
+        ).astype(np.float32)
+
+        # FAISS search
+        scores, indices = index.search(query_embedding, query.max_results)
+        
+        # Process results for frontend compatibility
+        results = []
+        for idx in indices[0]:
+            assessment = assessments[idx]
+            results.append({
+                "Assessment Name": assessment["Assessment_name"],
+                "URL": assessment["URL"],
+                "Remote Testing": "Yes" if assessment["Remote_testing_support"] else "No",
+                "Adaptive Support": assessment.get("Adaptive/IRT Support", "No"),
+                "Duration": f"{assessment['Duration_minutes']} minutes",
+                "Test Types": ", ".join(assessment["Test_types"])
+            })
+
+        return {
+            "query": query.text,
+            "processing_time": f"{(time.time() - start_time)*1000:.2f}ms",
+            "results": results
+        }
     
-    results = []
-    for idx in indices[0]:
-        assessment = assessments[idx]
-        results.append({
-            "Assessment Name": assessment["title"],
-            "URL": assessment["url"],
-            "Remote Testing": assessment["remote_testing"],
-            "Adaptive Support": assessment.get("adaptive_supported", "No Information"),
-            "Duration": f"{assessment['duration_minutes']} minutes",
-            "Test Types": ", ".join(assessment["test_types_full"])
-        })
-    
-    return {"query": query.text, "results": results}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/")
+def health_check():
+    return {
+        "status": "active",
+        "assessments_loaded": len(assessments),
+        "faiss_index_size": index.ntotal if index else 0
+    }
